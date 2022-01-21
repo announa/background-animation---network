@@ -10,6 +10,7 @@ class Point {
     this.id = Math.floor(Math.random() * 10);
     this.x = x;
     this.y = y;
+    this.speed = { x: -0.5 + Math.random() * 1, y: -0.5 + Math.random() * 1 };
   }
 }
 
@@ -59,7 +60,7 @@ function getLines() {
 }
 
 function pointsAreClose(point_1, point_2) {
-  const distance = Math.sqrt(Math.pow(point_1.x - point_2.x, 2) + Math.pow(point_1.y - point_2.y, 2))
+  const distance = Math.sqrt(Math.pow(point_1.x - point_2.x, 2) + Math.pow(point_1.y - point_2.y, 2));
   return distance < 0.2 * canvas.width && distance > 0;
 }
 
@@ -68,11 +69,26 @@ function containsLine(line) {
 }
 
 function draw() {
+  requestAnimationFrame(draw);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   linesToDraw.forEach((l, i) => {
     ctx.beginPath();
     ctx.strokeStyle = `hsl(165, 100%, 10%)`;
     ctx.moveTo(l.x1, l.y1);
     ctx.lineTo(l.x2, l.y2);
     ctx.stroke();
+  });
+  animate();
+}
+
+function animate() {
+  movePoints();
+  getLines();
+}
+
+function movePoints() {
+  points.forEach((p, i) => {
+    p.x = p.x + p.speed.x;
+    p.y = p.y + p.speed.y;
   });
 }
