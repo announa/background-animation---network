@@ -29,7 +29,7 @@ function initCanvas() {
 }
 
 function createPoints() {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 30; i++) {
     const point = new Point(getX(), getY());
     points.push(point);
   }
@@ -46,12 +46,14 @@ function getY() {
 function getLines() {
   points.forEach((p) => {
     for (let i = 0; i < points.length; i++) {
-      if (pointsAreClose(p, points[i])) {
+      const dist = getDistance(p, points[i]);
+      if (pointsAreClose(dist)) {
         const line = {
           x1: p.x,
           y1: p.y,
           x2: points[i].x,
           y2: points[i].y,
+          length: dist,
         };
         if (!containsLine(line)) linesToDraw.push(line);
       }
@@ -59,8 +61,11 @@ function getLines() {
   });
 }
 
-function pointsAreClose(point_1, point_2) {
-  const distance = Math.sqrt(Math.pow(point_1.x - point_2.x, 2) + Math.pow(point_1.y - point_2.y, 2));
+function getDistance(point_1, point_2) {
+  return Math.sqrt(Math.pow(point_1.x - point_2.x, 2) + Math.pow(point_1.y - point_2.y, 2));
+}
+
+function pointsAreClose(distance) {
   return distance < 0.2 * canvas.width && distance > 0;
 }
 
@@ -72,13 +77,26 @@ function draw() {
   requestAnimationFrame(draw);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   linesToDraw.forEach((l, i) => {
+    const alpha = getStrokeAlpha(l);
     ctx.beginPath();
-    ctx.strokeStyle = `hsl(165, 100%, 10%)`;
+    ctx.strokeStyle = `hsla(165, 100%, 10%, ${alpha})`;
     ctx.moveTo(l.x1, l.y1);
     ctx.lineTo(l.x2, l.y2);
     ctx.stroke();
+    linesToDraw.splice(i, 1);
   });
   animate();
+}
+
+function getStrokeAlpha(l) {
+  let alpha;
+  if (l.length <= 0.1 * canvas.width) {
+    return 1;
+  } else {
+    let ratio = -(0.1 * canvas.width - l.length) / (0.1 * canvas.width);
+    alpha = 1 - ratio;
+    return alpha;
+  }
 }
 
 function animate() {
