@@ -17,6 +17,7 @@ function init() {
   initCanvas();
   createPoints();
   getLines();
+  draw();
 }
 
 function initCanvas() {
@@ -64,4 +65,14 @@ function pointsAreClose(point_1, point_2) {
 
 function containsLine(line) {
   return linesToDraw.find((l) => l == line);
+}
+
+function draw() {
+  linesToDraw.forEach((l, i) => {
+    ctx.beginPath();
+    ctx.strokeStyle = `hsl(165, 100%, 10%)`;
+    ctx.moveTo(l.x1, l.y1);
+    ctx.lineTo(l.x2, l.y2);
+    ctx.stroke();
+  });
 }
