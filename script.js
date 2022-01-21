@@ -16,6 +16,7 @@ class Point {
 function init() {
   initCanvas();
   createPoints();
+  getLines();
 }
 
 function initCanvas() {
@@ -38,4 +39,29 @@ function getX() {
 
 function getY() {
   return Math.random() * canvas.height;
+}
+
+function getLines() {
+  points.forEach((p) => {
+    for (let i = 0; i < points.length; i++) {
+      if (pointsAreClose(p, points[i])) {
+        const line = {
+          x1: p.x,
+          y1: p.y,
+          x2: points[i].x,
+          y2: points[i].y,
+        };
+        if (!containsLine(line)) linesToDraw.push(line);
+      }
+    }
+  });
+}
+
+function pointsAreClose(point_1, point_2) {
+  const distance = Math.sqrt(Math.pow(point_1.x - point_2.x, 2) + Math.pow(point_1.y - point_2.y, 2))
+  return distance < 0.2 * canvas.width && distance > 0;
+}
+
+function containsLine(line) {
+  return linesToDraw.find((l) => l == line);
 }
