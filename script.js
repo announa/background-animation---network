@@ -38,8 +38,7 @@ class Line {
     this.x2 = point_2.x;
     this.y2 = point_2.y;
     this.length = point_1.getDistance(point_2);
-    this.color = isMousePoint? 320 : 165;
-    console.log(this.color)
+    this.color = isMousePoint ? 200 : 165;
   }
 }
 
@@ -80,8 +79,9 @@ function createLines() {
 
 function getMouseLines() {
   const currentMousepoint = hasMousePoint();
-  if (currentMousepoint) getLines(currentMousepoint, true);
-  console.log('mouselines')
+  if (currentMousepoint) {
+    getLines(currentMousepoint, 0, true);
+  }
 }
 
 function hasMousePoint() {
@@ -90,9 +90,9 @@ function hasMousePoint() {
 
 function getLines(point, index, isMousePoint) {
   for (let i = 0; i < points.length; i++) {
-    if (point.pointsAreClose(points[i], 0.2 * canvas.width) && points[i].id === 0 && i > index){
-      const line = new Line(point, points[i], isMousePoint)
-     linesToDraw.push(line);
+    if (point.pointsAreClose(points[i], 0.2 * canvas.width) && points[i].id === 0 && i > index) {
+      const line = new Line(point, points[i], isMousePoint);
+      linesToDraw.push(line);
     }
   }
 }
@@ -170,7 +170,6 @@ function checkPointPosition(point, index) {
 }
 
 function outOfView(p) {
-  /* console.log(p.x < -0.1 * canvas.width || p.x > canvas.width + 0.1 * canvas.width || p.y < -0.1 * canvas.width || p.y > canvas.hight + 0.1 * canvas.width) */
   return (
     p.x < -0.1 * canvas.width ||
     p.x > canvas.width + 0.1 * canvas.width ||
@@ -191,13 +190,13 @@ function createMousePoint(event) {
   mousePoint = new Point(event.x, event.y, false);
   mouseId = mousePoint.id;
   points.push(mousePoint);
-  getMouseLines();
+  createLines();
 }
 
 function moveMousePoint(event) {
   mousePoint.x = event.x;
   mousePoint.y = event.y;
-  getMouseLines();
+  createLines();
 }
 
 function removeMousePoint() {
