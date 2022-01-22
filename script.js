@@ -4,13 +4,18 @@ let canvas;
 let ctx;
 let points = [];
 let linesToDraw = [];
+let mousePoint = {};
 
 class Point {
-  constructor(x, y) {
-    this.id = Math.floor(Math.random() * 10);
+  constructor(x, y, speed) {
     this.x = x;
     this.y = y;
-    this.speed = { x: -0.5 + Math.random() * 1, y: -0.5 + Math.random() * 1 };
+    if (speed) {
+      this.speed = { x: -0.5 + Math.random() * 1, y: -0.5 + Math.random() * 1 };
+    } else {
+      this.speed = 0;
+      this.id = Math.random() * 10000;
+    }
   }
 }
 
@@ -30,7 +35,7 @@ function initCanvas() {
 
 function createPoints(count) {
   for (let i = 0; i < count; i++) {
-    const point = new Point(getX(), getY());
+    const point = new Point(getX(), getY(), true);
     points.push(point);
   }
 }
@@ -66,7 +71,9 @@ function getDistance(point_1, point_2) {
 }
 
 function pointsAreClose(distance) {
-  return distance < 0.2 * canvas.width && distance > 0;
+  maxDistance = 0.2 * canvas.width;
+  maxDistance < 100 ? 100 : maxDistance;
+  return distance < maxDistance && distance > 0;
 }
 
 function containsLine(line) {
@@ -126,7 +133,7 @@ function movePoints() {
   });
 }
 
-function checkPointPosition(point, index){
+function checkPointPosition(point, index) {
   if (outOfView(point)) {
     points.splice(index, 1);
     setTimeout(() => {
@@ -138,7 +145,35 @@ function checkPointPosition(point, index){
 
 function outOfView(p) {
   /* console.log(p.x < -0.1 * canvas.width || p.x > canvas.width + 0.1 * canvas.width || p.y < -0.1 * canvas.width || p.y > canvas.hight + 0.1 * canvas.width) */
-  return p.x < -0.1 * canvas.width || p.x > canvas.width + 0.1 * canvas.width || p.y < -0.1 * canvas.width || p.y > canvas.hight + 0.1 * canvas.width;
+  return (
+    p.x < -0.1 * canvas.width ||
+    p.x > canvas.width + 0.1 * canvas.width ||
+    p.y < -0.1 * canvas.width ||
+    p.y > canvas.hight + 0.1 * canvas.width
+  );
 }
 
-window.addEventListener('resize', initCanvas)
+window.addEventListener('resize', initCanvas);
+
+/* -----------  MOUSE ANIMATION  ------------- */
+
+document.documentElement.addEventListener('mouseenter', createMousePoint);
+document.documentElement.addEventListener('mousemove', moveMousePoint);
+
+let mouseId;
+
+function createMousePoint(event) {
+  mousePoint = new Point(event.x, event.y, false);
+  mouseId = mousePoint.id;
+  points.push(mousePoint);
+  console.log(mousePoint);
+  console.log(points);
+  getLines();
+}
+
+function moveMousePoint(event) {
+  console.log(event);
+  mousePoint.x = event.x;
+  mousePoint.y = event.y;
+  getLines();
+}
