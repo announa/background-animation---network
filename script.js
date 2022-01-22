@@ -14,16 +14,39 @@ class Point {
       this.speed = { x: -0.5 + Math.random() * 1, y: -0.5 + Math.random() * 1 };
       this.id = 0;
     } else {
-      this.speed = {x: 0, y: 0};
-      this.id = Math.random() * 10000;
+      this.speed = { x: 0, y: 0 };
+      this.id = Math.random() * 100;
     }
+  }
+
+  pointsAreClose(point_2, canvas) {
+    const distance = this.getDistance(point_2);
+    let maxDistance = canvas;
+    maxDistance < 100 ? 100 : maxDistance;
+    return distance < maxDistance && distance > 0;
+  }
+
+  getDistance(point_2) {
+    return Math.sqrt(Math.pow(this.x - point_2.x, 2) + Math.pow(this.y - point_2.y, 2));
+  }
+}
+
+class Line {
+  constructor(point_1, point_2, isMousePoint) {
+    this.x1 = point_1.x;
+    this.y1 = point_1.y;
+    this.x2 = point_2.x;
+    this.y2 = point_2.y;
+    this.length = point_1.getDistance(point_2);
+    this.color = isMousePoint? 320 : 165;
+    console.log(this.color)
   }
 }
 
 function init() {
   initCanvas();
-  createPoints(40);
-  getLines();
+  createPoints(30);
+  createLines();
   draw();
 }
 
@@ -49,36 +72,33 @@ function getY() {
   return Math.random() * canvas.height;
 }
 
-function getLines() {
-  points.forEach((p) => {
-    for (let i = 0; i < points.length; i++) {
-      const dist = getDistance(p, points[i]);
-      if (pointsAreClose(dist)) {
-        const line = {
-          x1: p.x,
-          y1: p.y,
-          x2: points[i].x,
-          y2: points[i].y,
-          length: dist,
-        };
-        if (!containsLine(line)) linesToDraw.push(line);
-      }
+function createLines() {
+  linesToDraw = [];
+  getMouseLines();
+  points.forEach((p, i) => getLines(p, i, false));
+}
+
+function getMouseLines() {
+  const currentMousepoint = hasMousePoint();
+  if (currentMousepoint) getLines(currentMousepoint, true);
+  console.log('mouselines')
+}
+
+function hasMousePoint() {
+  return points.find((p) => p.id > 0);
+}
+
+function getLines(point, index, isMousePoint) {
+  for (let i = 0; i < points.length; i++) {
+    if (point.pointsAreClose(points[i], 0.2 * canvas.width) && points[i].id === 0 && i > index){
+      const line = new Line(point, points[i], isMousePoint)
+     linesToDraw.push(line);
     }
-  });
-}
-
-function getDistance(point_1, point_2) {
-  return Math.sqrt(Math.pow(point_1.x - point_2.x, 2) + Math.pow(point_1.y - point_2.y, 2));
-}
-
-function pointsAreClose(distance) {
-  maxDistance = 0.2 * canvas.width;
-  maxDistance < 100 ? 100 : maxDistance;
-  return distance < maxDistance && distance > 0;
+  }
 }
 
 function containsLine(line) {
-  return linesToDraw.find((l) => l == line);
+  return linesToDraw.find((l) => l.x1 === line.x2 && l.y1 === line.y2 && l.x2 === line.x1 && l.y2 === line.y1);
 }
 
 function draw() {
@@ -100,14 +120,19 @@ function drawPoints() {
 
 function drawLines() {
   linesToDraw.forEach((l, i) => {
-    const alpha = getStrokeAlpha(l);
+    ctx.strokeStyle = getLineColor(l);
     ctx.beginPath();
-    ctx.strokeStyle = `hsla(165, 100%, 10%, ${alpha})`;
     ctx.moveTo(l.x1, l.y1);
     ctx.lineTo(l.x2, l.y2);
     ctx.stroke();
-    linesToDraw.splice(i, 1);
+    /* linesToDraw.splice(i, 1); */
   });
+}
+
+function getLineColor(l) {
+  const alpha = getStrokeAlpha(l);
+  const hue = l.color;
+  return `hsla(${hue}, 100%, 50%, ${alpha})`;
 }
 
 function getStrokeAlpha(l) {
@@ -123,7 +148,7 @@ function getStrokeAlpha(l) {
 
 function animate() {
   movePoints();
-  getLines();
+  createLines();
 }
 
 function movePoints() {
@@ -139,7 +164,7 @@ function checkPointPosition(point, index) {
     points.splice(index, 1);
     setTimeout(() => {
       createPoints(1);
-      getLines();
+      createLines();
     }, 500);
   }
 }
@@ -162,22 +187,20 @@ document.documentElement.addEventListener('mouseenter', createMousePoint);
 document.documentElement.addEventListener('mousemove', moveMousePoint);
 document.documentElement.addEventListener('mouseleave', removeMousePoint);
 
-let mouseId;
-
 function createMousePoint(event) {
   mousePoint = new Point(event.x, event.y, false);
   mouseId = mousePoint.id;
   points.push(mousePoint);
-  getLines();
+  getMouseLines();
 }
 
 function moveMousePoint(event) {
   mousePoint.x = event.x;
   mousePoint.y = event.y;
-  getLines();
+  getMouseLines();
 }
 
-function removeMousePoint(){
-  const index = points.findIndex(p => p.id === mouseId)
-  points.splice(index, 1)
+function removeMousePoint() {
+  const index = points.findIndex((p) => p.id > 0);
+  points.splice(index, 1);
 }
