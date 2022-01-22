@@ -32,19 +32,19 @@ class Point {
 }
 
 class Line {
-  constructor(point_1, point_2, isMousePoint) {
+  constructor(point_1, point_2, isMouseLine) {
     this.x1 = point_1.x;
     this.y1 = point_1.y;
     this.x2 = point_2.x;
     this.y2 = point_2.y;
     this.length = point_1.getDistance(point_2);
-    this.color = {h: isMousePoint ? 270 : 165, l: isMousePoint ? 40 : 10};
+    this.isMouseLine = isMouseLine;
   }
 }
 
 function init() {
   initCanvas();
-  createPoints(30);
+  createPoints(40);
   createLines();
   draw();
 }
@@ -88,10 +88,10 @@ function hasMousePoint() {
   return points.find((p) => p.id > 0);
 }
 
-function getLines(point, index, isMousePoint) {
+function getLines(point, index, isMouseLine) {
   for (let i = 0; i < points.length; i++) {
     if (point.pointsAreClose(points[i], 0.2 * canvas.width) && points[i].id === 0 && i > index) {
-      const line = new Line(point, points[i], isMousePoint);
+      const line = new Line(point, points[i], isMouseLine);
       linesToDraw.push(line);
     }
   }
@@ -120,7 +120,7 @@ function drawPoints() {
 
 function drawLines() {
   linesToDraw.forEach((l, i) => {
-    ctx.strokeStyle = getLineColor(l);
+    ctx.strokeStyle = l.isMouseLine? getLineGradient(l) : getLineColor(l);
     ctx.beginPath();
     ctx.moveTo(l.x1, l.y1);
     ctx.lineTo(l.x2, l.y2);
@@ -131,9 +131,16 @@ function drawLines() {
 
 function getLineColor(l) {
   const alpha = getStrokeAlpha(l);
-  const hue = l.color.h;
-  const light = l.color.l;
-  return `hsla(${hue}, 100%, ${light}%, ${alpha})`;
+  return `hsla(165, 100%,10%, ${alpha})`;
+}
+
+function getLineGradient(l){
+  const alpha = getStrokeAlpha(l);
+  let gradient = ctx.createLinearGradient(l.x1, l.y1, l.x2, l.y2);
+  gradient.addColorStop(0, `hsla(270, 100%, 50%, ${alpha}`);
+  gradient.addColorStop(0.5, `hsla(217, 100%, 30%, ${alpha}`);
+  gradient.addColorStop(1 ,`hsla(165, 100%,10%, ${alpha})`);
+  return gradient;
 }
 
 function getStrokeAlpha(l) {

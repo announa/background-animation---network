@@ -8,5 +8,6 @@ body {
 #canvas {
   display: block;
   background-color: hsl(317, 100%, 31%);
+  background-color: rgb(26, 0, 51);
   background-color: rgb(10, 10, 10);
 }
