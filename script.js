@@ -16,7 +16,7 @@ class Point {
 
 function init() {
   initCanvas();
-  createPoints();
+  createPoints(40);
   getLines();
   draw();
 }
@@ -28,8 +28,8 @@ function initCanvas() {
   ctx = canvas.getContext('2d');
 }
 
-function createPoints() {
-  for (let i = 0; i < 30; i++) {
+function createPoints(count) {
+  for (let i = 0; i < count; i++) {
     const point = new Point(getX(), getY());
     points.push(point);
   }
@@ -85,12 +85,12 @@ function drawPoints() {
   points.forEach((p) => {
     ctx.fillStyle = 'hsl(165, 100%, 15%)';
     ctx.beginPath();
-    ctx.arc(p.x - 0.6, p.y - 0.6, 1.2, 0, 2 * Math.PI)
+    ctx.arc(p.x - 0.6, p.y - 0.6, 1.2, 0, 2 * Math.PI);
     ctx.fill();
   });
 }
 
-function drawLines(){
+function drawLines() {
   linesToDraw.forEach((l, i) => {
     const alpha = getStrokeAlpha(l);
     ctx.beginPath();
@@ -122,5 +122,21 @@ function movePoints() {
   points.forEach((p, i) => {
     p.x = p.x + p.speed.x;
     p.y = p.y + p.speed.y;
+    checkPointPosition(p, i);
   });
+}
+
+function checkPointPosition(point, index){
+  if (outOfView(point)) {
+    points.splice(index, 1);
+    setTimeout(() => {
+      createPoints(1);
+      getLines();
+    }, 500);
+  }
+}
+
+function outOfView(p) {
+  /* console.log(p.x < -0.1 * canvas.width || p.x > canvas.width + 0.1 * canvas.width || p.y < -0.1 * canvas.width || p.y > canvas.hight + 0.1 * canvas.width) */
+  return p.x < -0.1 * canvas.width || p.x > canvas.width + 0.1 * canvas.width || p.y < -0.1 * canvas.width || p.y > canvas.hight + 0.1 * canvas.width;
 }
