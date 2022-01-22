@@ -76,6 +76,21 @@ function containsLine(line) {
 function draw() {
   requestAnimationFrame(draw);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawPoints();
+  drawLines();
+  animate();
+}
+
+function drawPoints() {
+  points.forEach((p) => {
+    ctx.fillStyle = 'hsl(165, 100%, 15%)';
+    ctx.beginPath();
+    ctx.arc(p.x - 0.6, p.y - 0.6, 1.2, 0, 2 * Math.PI)
+    ctx.fill();
+  });
+}
+
+function drawLines(){
   linesToDraw.forEach((l, i) => {
     const alpha = getStrokeAlpha(l);
     ctx.beginPath();
@@ -85,7 +100,6 @@ function draw() {
     ctx.stroke();
     linesToDraw.splice(i, 1);
   });
-  animate();
 }
 
 function getStrokeAlpha(l) {
