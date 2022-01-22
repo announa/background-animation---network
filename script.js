@@ -140,3 +140,5 @@ function outOfView(p) {
   /* console.log(p.x < -0.1 * canvas.width || p.x > canvas.width + 0.1 * canvas.width || p.y < -0.1 * canvas.width || p.y > canvas.hight + 0.1 * canvas.width) */
   return p.x < -0.1 * canvas.width || p.x > canvas.width + 0.1 * canvas.width || p.y < -0.1 * canvas.width || p.y > canvas.hight + 0.1 * canvas.width;
 }
+
+window.addEventListener('resize', initCanvas)
