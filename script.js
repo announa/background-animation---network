@@ -12,8 +12,9 @@ class Point {
     this.y = y;
     if (speed) {
       this.speed = { x: -0.5 + Math.random() * 1, y: -0.5 + Math.random() * 1 };
+      this.id = 0;
     } else {
-      this.speed = 0;
+      this.speed = {x: 0, y: 0};
       this.id = Math.random() * 10000;
     }
   }
@@ -159,6 +160,7 @@ window.addEventListener('resize', initCanvas);
 
 document.documentElement.addEventListener('mouseenter', createMousePoint);
 document.documentElement.addEventListener('mousemove', moveMousePoint);
+document.documentElement.addEventListener('mouseleave', removeMousePoint);
 
 let mouseId;
 
@@ -166,14 +168,16 @@ function createMousePoint(event) {
   mousePoint = new Point(event.x, event.y, false);
   mouseId = mousePoint.id;
   points.push(mousePoint);
-  console.log(mousePoint);
-  console.log(points);
   getLines();
 }
 
 function moveMousePoint(event) {
-  console.log(event);
   mousePoint.x = event.x;
   mousePoint.y = event.y;
   getLines();
+}
+
+function removeMousePoint(){
+  const index = points.findIndex(p => p.id === mouseId)
+  points.splice(index, 1)
 }
