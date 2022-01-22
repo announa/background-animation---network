@@ -7,15 +7,15 @@ let linesToDraw = [];
 let mousePoint = {};
 
 class Point {
-  constructor(x, y, speed) {
+  constructor(x, y, isMousePoint) {
     this.x = x;
     this.y = y;
-    if (speed) {
-      this.speed = { x: -0.5 + Math.random() * 1, y: -0.5 + Math.random() * 1 };
-      this.id = 0;
-    } else {
+    if (isMousePoint) {
       this.speed = { x: 0, y: 0 };
-      this.id = Math.random() * 100;
+      this.isMousePoint = true;
+    } else {
+      this.speed = { x: -0.5 + Math.random() * 1, y: -0.5 + Math.random() * 1 };
+      this.isMousePoint = false;
     }
   }
 
@@ -51,14 +51,15 @@ function init() {
 
 function initCanvas() {
   canvas = document.getElementById('canvas');
-  canvas.width = document.documentElement.clientWidth;
-  canvas.height = document.documentElement.clientHeight;
+  const canvasContainer = document.getElementById('canvas-container')
+  canvas.width = canvasContainer.clientWidth;
+  canvas.height = canvasContainer.clientHeight;
   ctx = canvas.getContext('2d');
 }
 
 function createPoints(count) {
   for (let i = 0; i < count; i++) {
-    const point = new Point(getX(), getY(), true);
+    const point = new Point(getX(), getY(), false);
     points.push(point);
   }
 }
@@ -85,12 +86,12 @@ function getMouseLines() {
 }
 
 function hasMousePoint() {
-  return points.find((p) => p.id > 0);
+  return points.find((p) => p.isMousePoint === true);
 }
 
 function getLines(point, index, isMouseLine) {
   for (let i = 0; i < points.length; i++) {
-    if (point.pointsAreClose(points[i], 0.2 * canvas.width) && points[i].id === 0 && i > index) {
+    if (point.pointsAreClose(points[i], 0.2 * canvas.width) && !points[i].isMousePoint && i > index) {
       const line = new Line(point, points[i], isMouseLine);
       linesToDraw.push(line);
     }
@@ -111,7 +112,7 @@ function draw() {
 
 function drawPoints() {
   points.forEach((p) => {
-    ctx.fillStyle = 'hsl(165, 100%, 15%)';
+    ctx.fillStyle = p.isMousePoint ? 'hsl(270, 40%, 30%)' : 'hsl(165, 100%, 15%)';
     ctx.beginPath();
     ctx.arc(p.x - 0.6, p.y - 0.6, 1.2, 0, 2 * Math.PI);
     ctx.fill();
@@ -137,8 +138,8 @@ function getLineColor(l) {
 function getLineGradient(l){
   const alpha = getStrokeAlpha(l);
   let gradient = ctx.createLinearGradient(l.x1, l.y1, l.x2, l.y2);
-  gradient.addColorStop(0, `hsla(270, 100%, 50%, ${alpha}`);
-  gradient.addColorStop(0.5, `hsla(217, 100%, 30%, ${alpha}`);
+  gradient.addColorStop(0, `hsla(270, 80%, 50%, ${alpha}`);
+  gradient.addColorStop(0.5, `hsla(217, 90%, 30%, ${alpha}`);
   gradient.addColorStop(1 ,`hsla(165, 100%,10%, ${alpha})`);
   return gradient;
 }
@@ -195,8 +196,7 @@ document.documentElement.addEventListener('mousemove', moveMousePoint);
 document.documentElement.addEventListener('mouseleave', removeMousePoint);
 
 function createMousePoint(event) {
-  mousePoint = new Point(event.x, event.y, false);
-  mouseId = mousePoint.id;
+  mousePoint = new Point(event.x, event.y, true);
   points.push(mousePoint);
   createLines();
 }
@@ -208,6 +208,6 @@ function moveMousePoint(event) {
 }
 
 function removeMousePoint() {
-  const index = points.findIndex((p) => p.id > 0);
+  const index = points.findIndex((p) => p.isMousePoint === true);
   points.splice(index, 1);
 }
