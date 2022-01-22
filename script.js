@@ -38,7 +38,7 @@ class Line {
     this.x2 = point_2.x;
     this.y2 = point_2.y;
     this.length = point_1.getDistance(point_2);
-    this.color = isMousePoint ? 200 : 165;
+    this.color = {h: isMousePoint ? 270 : 165, l: isMousePoint ? 40 : 10};
   }
 }
 
@@ -131,8 +131,9 @@ function drawLines() {
 
 function getLineColor(l) {
   const alpha = getStrokeAlpha(l);
-  const hue = l.color;
-  return `hsla(${hue}, 100%, 50%, ${alpha})`;
+  const hue = l.color.h;
+  const light = l.color.l;
+  return `hsla(${hue}, 100%, ${light}%, ${alpha})`;
 }
 
 function getStrokeAlpha(l) {
