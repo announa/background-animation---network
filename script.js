@@ -44,14 +44,14 @@ class Line {
 
 function init() {
   initCanvas();
-  createPoints(40);
+  createPoints(80);
   createLines();
   draw();
 }
 
 function initCanvas() {
   canvas = document.getElementById('canvas');
-  const canvasContainer = document.getElementById('canvas-container')
+  const canvasContainer = document.getElementById('canvas-container');
   canvas.width = canvasContainer.clientWidth;
   canvas.height = canvasContainer.clientHeight;
   ctx = canvas.getContext('2d');
@@ -59,8 +59,10 @@ function initCanvas() {
 
 function createPoints(count) {
   for (let i = 0; i < count; i++) {
-    const point = new Point(getX(), getY(), false);
-    points.push(point);
+    setTimeout(() => {
+      const point = new Point(getX(), getY(), false);
+      points.push(point);
+    }, i * 300);
   }
 }
 
@@ -79,14 +81,9 @@ function createLines() {
 }
 
 function getMouseLines() {
-  const currentMousepoint = hasMousePoint();
-  if (currentMousepoint) {
-    getLines(currentMousepoint, 0, true);
+  if (mousePoint.isMousePoint) {
+    getLines(mousePoint, 0, true);
   }
-}
-
-function hasMousePoint() {
-  return points.find((p) => p.isMousePoint === true);
 }
 
 function getLines(point, index, isMouseLine) {
@@ -121,7 +118,7 @@ function drawPoints() {
 
 function drawLines() {
   linesToDraw.forEach((l, i) => {
-    ctx.strokeStyle = l.isMouseLine? getLineGradient(l) : getLineColor(l);
+    ctx.strokeStyle = l.isMouseLine ? getLineGradient(l) : getLineColor(l);
     ctx.beginPath();
     ctx.moveTo(l.x1, l.y1);
     ctx.lineTo(l.x2, l.y2);
@@ -132,15 +129,15 @@ function drawLines() {
 
 function getLineColor(l) {
   const alpha = getStrokeAlpha(l);
-  return `hsla(165, 100%,10%, ${alpha})`;
+  return `hsla(165, 100%,20%, ${alpha})`;
 }
 
-function getLineGradient(l){
+function getLineGradient(l) {
   const alpha = getStrokeAlpha(l);
   let gradient = ctx.createLinearGradient(l.x1, l.y1, l.x2, l.y2);
-  gradient.addColorStop(0, `hsla(270, 80%, 50%, ${alpha}`);
-  gradient.addColorStop(0.5, `hsla(217, 90%, 30%, ${alpha}`);
-  gradient.addColorStop(1 ,`hsla(165, 100%,10%, ${alpha})`);
+  gradient.addColorStop(0, `hsla(270, 80%, 60%, ${alpha}`);
+  gradient.addColorStop(0.5, `hsla(217, 90%, 40%, ${alpha}`);
+  gradient.addColorStop(1, `hsla(165, 100%,20%, ${alpha})`);
   return gradient;
 }
 
@@ -191,7 +188,7 @@ window.addEventListener('resize', initCanvas);
 
 /* -----------  MOUSE ANIMATION  ------------- */
 
-document.documentElement.addEventListener('mouseenter', createMousePoint);
+/* document.documentElement.addEventListener('mouseenter', createMousePoint); */
 document.documentElement.addEventListener('mousemove', moveMousePoint);
 document.documentElement.addEventListener('mouseleave', removeMousePoint);
 
@@ -202,12 +199,16 @@ function createMousePoint(event) {
 }
 
 function moveMousePoint(event) {
-  mousePoint.x = event.x;
-  mousePoint.y = event.y;
-  createLines();
+  if(!mousePoint.isMousePoint){
+    createMousePoint(event)
+  }
+    mousePoint.x = event.x;
+    mousePoint.y = event.y;
+    createLines();
 }
 
 function removeMousePoint() {
   const index = points.findIndex((p) => p.isMousePoint === true);
   points.splice(index, 1);
+  mousePoint.isMousePoint = false;
 }
