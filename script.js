@@ -45,7 +45,7 @@ class Line {
 function init() {
   console.log('init')
   initCanvas();
-  createPoints(60);
+  createPoints(70);
   createLines();
   draw();
 }
