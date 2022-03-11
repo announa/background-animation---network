@@ -43,8 +43,9 @@ class Line {
 }
 
 function init() {
+  console.log('init')
   initCanvas();
-  createPoints(80);
+  createPoints(60);
   createLines();
   draw();
 }
@@ -62,7 +63,7 @@ function createPoints(count) {
     setTimeout(() => {
       const point = new Point(getX(), getY(), false);
       points.push(point);
-    }, i * 300);
+    }, i * 200);
   }
 }
 
@@ -82,13 +83,13 @@ function createLines() {
 
 function getMouseLines() {
   if (mousePoint.isMousePoint) {
-    getLines(mousePoint, 0, true);
+    getLines(mousePoint, -1, true);
   }
 }
 
 function getLines(point, index, isMouseLine) {
   for (let i = 0; i < points.length; i++) {
-    if (point.pointsAreClose(points[i], 0.2 * canvas.width) && !points[i].isMousePoint && i > index) {
+    if (point.pointsAreClose(points[i], 0.2 * canvas.width) && i > index) {
       const line = new Line(point, points[i], isMouseLine);
       linesToDraw.push(line);
     }
@@ -100,7 +101,7 @@ function containsLine(line) {
 }
 
 function draw() {
-  requestAnimationFrame(draw);
+  requestAnimationFrame(() => draw());
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawPoints();
   drawLines();
@@ -123,21 +124,20 @@ function drawLines() {
     ctx.moveTo(l.x1, l.y1);
     ctx.lineTo(l.x2, l.y2);
     ctx.stroke();
-    /* linesToDraw.splice(i, 1); */
   });
 }
 
 function getLineColor(l) {
   const alpha = getStrokeAlpha(l);
-  return `hsla(165, 100%,20%, ${alpha})`;
+  return `hsla(180, 100%,20%, ${alpha})`;
 }
 
 function getLineGradient(l) {
   const alpha = getStrokeAlpha(l);
   let gradient = ctx.createLinearGradient(l.x1, l.y1, l.x2, l.y2);
-  gradient.addColorStop(0, `hsla(270, 80%, 60%, ${alpha}`);
-  gradient.addColorStop(0.5, `hsla(217, 90%, 40%, ${alpha}`);
-  gradient.addColorStop(1, `hsla(165, 100%,20%, ${alpha})`);
+  gradient.addColorStop(0, `hsla(270, 90%, 60%, ${alpha}`);
+  gradient.addColorStop(0.5, `hsla(217, 80%, 40%, ${alpha}`);
+  gradient.addColorStop(1, `hsla(180, 100%,20%, ${alpha})`);
   return gradient;
 }
 
@@ -188,13 +188,11 @@ window.addEventListener('resize', initCanvas);
 
 /* -----------  MOUSE ANIMATION  ------------- */
 
-/* document.documentElement.addEventListener('mouseenter', createMousePoint); */
 document.documentElement.addEventListener('mousemove', moveMousePoint);
 document.documentElement.addEventListener('mouseleave', removeMousePoint);
 
 function createMousePoint(event) {
   mousePoint = new Point(event.x, event.y, true);
-  points.push(mousePoint);
   createLines();
 }
 
@@ -208,7 +206,5 @@ function moveMousePoint(event) {
 }
 
 function removeMousePoint() {
-  const index = points.findIndex((p) => p.isMousePoint === true);
-  points.splice(index, 1);
   mousePoint.isMousePoint = false;
 }
