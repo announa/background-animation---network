@@ -45,7 +45,7 @@ class Line {
 function init() {
   console.log('init')
   initCanvas();
-  createPoints(70);
+  createPoints(60);
   createLines();
   draw();
 }
@@ -110,7 +110,7 @@ function draw() {
 
 function drawPoints() {
   points.forEach((p) => {
-    ctx.fillStyle = p.isMousePoint ? 'hsl(270, 40%, 30%)' : 'hsl(165, 100%, 15%)';
+    ctx.fillStyle = p.isMousePoint ? 'hsl(280, 100%, 64%)' : 'hsl(165, 100%, 15%)';
     ctx.beginPath();
     ctx.arc(p.x - 0.6, p.y - 0.6, 1.2, 0, 2 * Math.PI);
     ctx.fill();
@@ -121,6 +121,7 @@ function drawLines() {
   linesToDraw.forEach((l, i) => {
     ctx.strokeStyle = l.isMouseLine ? getLineGradient(l) : getLineColor(l);
     ctx.beginPath();
+    ctx.lineWidth = '2';
     ctx.moveTo(l.x1, l.y1);
     ctx.lineTo(l.x2, l.y2);
     ctx.stroke();
@@ -129,15 +130,15 @@ function drawLines() {
 
 function getLineColor(l) {
   const alpha = getStrokeAlpha(l);
-  return `hsla(180, 100%,20%, ${alpha})`;
+  return `hsla(199, 87%, 72%, ${alpha})`;
 }
 
 function getLineGradient(l) {
   const alpha = getStrokeAlpha(l);
   let gradient = ctx.createLinearGradient(l.x1, l.y1, l.x2, l.y2);
-  gradient.addColorStop(0, `hsla(270, 90%, 60%, ${alpha}`);
+  gradient.addColorStop(0, `hsla(280, 100%, 64%, ${alpha}`);
   gradient.addColorStop(0.5, `hsla(217, 80%, 40%, ${alpha}`);
-  gradient.addColorStop(1, `hsla(180, 100%,20%, ${alpha})`);
+  gradient.addColorStop(1, `hsla(199, 87%, 72%, ${alpha})`);
   return gradient;
 }
 
